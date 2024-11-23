@@ -1,0 +1,70 @@
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl = env("DATABASE_URL_UNPOOLED")
+}
+
+
+model User {
+  id         String      @id @default(uuid())
+  email      String   @unique
+  password   String
+  username   String
+  role String @default("unknown")
+  description String @default(".") 
+  created_at DateTime @default(now())
+ 
+  applicant Match[] @relation("Applicant")
+  lawyer Match[] @relation("Lawyer")
+  vector Vector[] @relation("Vector")
+  bnpl Bnpl[] @relation("Bnpl")
+  message Message[] @relation("Message")
+}
+
+
+model Vector {
+  id String @id @default(uuid())
+  vector Float[]
+  user User @relation("Vector", references: [id], fields: [user_id]) 
+  user_id String
+  created_at DateTime @default(now())
+}
+
+
+
+model Match { // 채팅방 id 로도 쓸수 있음
+  id String @id @default(uuid())
+  applicant User @relation("Applicant", references: [id], fields: [applicant_id])
+  applicant_id String
+  lawyer User @relation("Lawyer", references: [id], fields: [lawyer_id])
+  lawyer_id String
+  status String @default("not accepted now") 
+  created_at DateTime @default(now())
+
+  message Message[] @relation("Chatroom")
+
+  @@unique([applicant_id, lawyer_id]) // 복합 유니크 키 설정
+}
+
+model Bnpl {
+  id String @id @default(uuid())
+  user User @relation("Bnpl", references: [id], fields: [user_id])
+  user_id String
+  amount Int
+  created_at DateTime @default(now())
+}
+
+model Message {
+  id String @id @default(uuid())
+  content String
+  match Match @relation("Chatroom", references: [id], fields: [match_id])
+  match_id String
+  user User @relation("Message", references: [id], fields: [user_id])
+  user_id String
+  created_at DateTime @default(now())
+}

@@ -1,0 +1,5 @@
+-- AlterTable
+ALTER TABLE "Bnpl" ADD COLUMN     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP;
+
+-- AlterTable
+ALTER TABLE "User" ALTER COLUMN "description" SET DEFAULT '.';
